@@ -12,7 +12,7 @@
 .swiftpm/
 migrate_working_dir/
 .env
-
+.supabase_config.dart
 # IntelliJ related
 *.iml
 *.ipr
