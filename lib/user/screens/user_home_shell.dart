@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import '../widgets/rounded_bottom_nav.dart';
+import '../widgets/chat_fab.dart';
 import 'home_screen.dart';
 import 'stores_screen.dart';
 import 'scan_screen.dart';
-import 'tips_screen.dart';
+import 'browse_screen.dart';
 import 'wishlist_screen.dart';
 
 class UserHomeShell extends StatefulWidget {
@@ -14,7 +15,7 @@ class UserHomeShell extends StatefulWidget {
 }
 
 class UserHomeShellState extends State<UserHomeShell> {
-  static const Color appBackground = Color(0xFFFDF9F0);
+  static const Color appBackground = Color(0xFFFFFFFF);
 
   int selectedIndex = 0;
 
@@ -22,7 +23,7 @@ class UserHomeShellState extends State<UserHomeShell> {
     UserHomeScreen(),
     StoresScreen(),
     ScanScreen(),
-    TipsScreen(),
+    BrowseScreen(),
     WishlistScreen(),
   ];
 
@@ -30,7 +31,7 @@ class UserHomeShellState extends State<UserHomeShell> {
     NavItemData(icon: Icons.home_rounded, label: 'Home'),
     NavItemData(icon: Icons.storefront_rounded, label: 'Stores'),
     NavItemData(icon: Icons.qr_code_scanner_rounded, label: 'Scan'),
-    NavItemData(icon: Icons.lightbulb_outline_rounded, label: 'Tips'),
+    NavItemData(icon: Icons.search_rounded, label: 'Search'),
     NavItemData(icon: Icons.favorite_border_rounded, label: 'Wishlist'),
   ];
 
@@ -40,7 +41,12 @@ class UserHomeShellState extends State<UserHomeShell> {
       backgroundColor: appBackground,
       body: SafeArea(
         bottom: false,
-        child: IndexedStack(index: selectedIndex, children: tabs),
+        child: Stack(
+          children: [
+            IndexedStack(index: selectedIndex, children: tabs),
+            const ChatFab(),
+          ],
+        ),
       ),
       bottomNavigationBar: RoundedBottomNav(
         selectedIndex: selectedIndex,

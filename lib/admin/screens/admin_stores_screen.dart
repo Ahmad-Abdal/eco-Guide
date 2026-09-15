@@ -7,43 +7,52 @@ import 'add_store_screen.dart';
 class AdminStoresScreen extends ConsumerWidget {
   const AdminStoresScreen({Key? key}) : super(key: key);
 
-  static const Color appBackground = Color(0xFFFDF9F0);
-  static const Color darkText = Color(0xFF2F4F4F);
-  static const Color vibrantGreen = Color(0xFF24AC5D);
-  static const Color darkTeal = Color(0xFF1C7043);
-  static const Color cardFill = Color(0xFFF3EEDD);
+  static const Color pureWhite = Colors.white;
+  static const Color textDark = Color(0xFF1A1A1A);
+  static const Color textGray = Color(0xFF6B6B6B);
+  static const Color primaryGreen = Color(0xFF1B7A43);
+  static const Color lightGreenBg = Color(0xFFE7F4EC);
+  static const Color borderGray = Color(0xFFE0E0E0);
+  static const Color sectionFill = Color(0xFFF7F8F6);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final storesAsync = ref.watch(storeListProvider);
 
     return Scaffold(
-      backgroundColor: appBackground,
+      backgroundColor: pureWhite,
       appBar: AppBar(
-        backgroundColor: appBackground,
+        backgroundColor: pureWhite,
         elevation: 0,
-        title: const Text('Stores', style: TextStyle(color: darkText, fontWeight: FontWeight.bold)),
+        title: const Text('Stores', style: TextStyle(color: textDark, fontWeight: FontWeight.bold)),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add_business_rounded, color: vibrantGreen),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AddStoreScreen()),
+          Container(
+            margin: const EdgeInsets.only(right: 12),
+            decoration: BoxDecoration(
+              color: lightGreenBg,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.add_business_rounded, color: primaryGreen),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AddStoreScreen()),
+              ),
             ),
           ),
         ],
       ),
       body: RefreshIndicator(
-        color: vibrantGreen,
+        color: primaryGreen,
         onRefresh: () async => ref.invalidate(storeListProvider),
         child: storesAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator(color: vibrantGreen)),
+          loading: () => const Center(child: CircularProgressIndicator(color: primaryGreen)),
           error: (error, stack) => ListView(
             children: [
               const SizedBox(height: 80),
               Center(
                 child: Text('Could not load stores.\n$error',
-                    textAlign: TextAlign.center, style: const TextStyle(color: darkText)),
+                    textAlign: TextAlign.center, style: const TextStyle(color: textDark)),
               ),
             ],
           ),
@@ -52,14 +61,25 @@ class AdminStoresScreen extends ConsumerWidget {
               return ListView(
                 children: [
                   const SizedBox(height: 80),
-                  const Icon(Icons.storefront_rounded, size: 48, color: darkTeal),
-                  const SizedBox(height: 12),
+                  Center(
+                    child: Container(
+                      width: 88,
+                      height: 88,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: lightGreenBg,
+                        border: Border.all(color: borderGray, width: 1),
+                      ),
+                      child: const Icon(Icons.storefront_rounded, size: 40, color: primaryGreen),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   const Center(
-                    child: Text('No stores yet', style: TextStyle(color: darkText, fontWeight: FontWeight.bold, fontSize: 18)),
+                    child: Text('No stores yet', style: TextStyle(color: textDark, fontWeight: FontWeight.bold, fontSize: 18)),
                   ),
                   const SizedBox(height: 4),
                   Center(
-                    child: Text('Tap + above to add your first store.', style: TextStyle(color: darkTeal.withOpacity(0.8))),
+                    child: Text('Tap + above to add your first store.', style: TextStyle(color: textGray)),
                   ),
                 ],
               );
@@ -78,8 +98,9 @@ class AdminStoresScreen extends ConsumerWidget {
                     margin: const EdgeInsets.only(bottom: 14),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: cardFill,
+                      color: sectionFill,
                       borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: borderGray, width: 1),
                     ),
                     child: Row(
                       children: [
@@ -93,8 +114,8 @@ class AdminStoresScreen extends ConsumerWidget {
                             errorBuilder: (context, error, stackTrace) => Container(
                               width: 64,
                               height: 64,
-                              color: Colors.white,
-                              child: const Icon(Icons.storefront_rounded, color: darkTeal),
+                              color: lightGreenBg,
+                              child: const Icon(Icons.storefront_rounded, color: primaryGreen),
                             ),
                           ),
                         ),
@@ -104,18 +125,18 @@ class AdminStoresScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(store.name,
-                                  style: const TextStyle(color: darkText, fontWeight: FontWeight.bold, fontSize: 16)),
+                                  style: const TextStyle(color: textDark, fontWeight: FontWeight.bold, fontSize: 16)),
                               const SizedBox(height: 4),
                               Row(
                                 children: [
-                                  const Icon(Icons.location_on_outlined, size: 14, color: darkTeal),
+                                  const Icon(Icons.location_on_outlined, size: 14, color: textGray),
                                   const SizedBox(width: 4),
                                   Expanded(
                                     child: Text(
                                       store.address,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(color: darkTeal, fontSize: 12),
+                                      style: const TextStyle(color: textGray, fontSize: 12),
                                     ),
                                   ),
                                 ],
@@ -127,23 +148,23 @@ class AdminStoresScreen extends ConsumerWidget {
                                     const Icon(Icons.star_rounded, size: 16, color: Color(0xFFF2B705)),
                                     const SizedBox(width: 2),
                                     Text(store.averageRating!.toStringAsFixed(1),
-                                        style: const TextStyle(color: darkText, fontWeight: FontWeight.w600, fontSize: 12)),
+                                        style: const TextStyle(color: textDark, fontWeight: FontWeight.w600, fontSize: 12)),
                                     Text(' (${store.ratingCount})',
-                                        style: TextStyle(color: darkTeal.withOpacity(0.7), fontSize: 11)),
+                                        style: TextStyle(color: textGray, fontSize: 11)),
                                   ] else
                                     Text('No ratings yet',
-                                        style: TextStyle(color: darkTeal.withOpacity(0.6), fontSize: 11)),
+                                        style: TextStyle(color: textGray, fontSize: 11)),
                                   const SizedBox(width: 12),
-                                  Icon(Icons.inventory_2_outlined, size: 14, color: darkTeal.withOpacity(0.7)),
+                                  Icon(Icons.inventory_2_outlined, size: 14, color: textGray),
                                   const SizedBox(width: 3),
                                   Text('${store.productCount} products',
-                                      style: TextStyle(color: darkTeal.withOpacity(0.7), fontSize: 11)),
+                                      style: TextStyle(color: textGray, fontSize: 11)),
                                 ],
                               ),
                             ],
                           ),
                         ),
-                        const Icon(Icons.chevron_right_rounded, color: darkTeal),
+                        const Icon(Icons.chevron_right_rounded, color: textGray),
                       ],
                     ),
                   ),

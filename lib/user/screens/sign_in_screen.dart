@@ -17,12 +17,13 @@ class SignInScreen extends ConsumerStatefulWidget {
 }
 
 class SignInScreenState extends ConsumerState<SignInScreen> {
-  static const Color appBackground =            Color(0xFFFFFFFF);//Color(0xFFFDF9F0);
-  static const Color darkText = Color(0xFF2F4F4F);
-  static const Color vibrantGreen = Color(0xFF24AC5D);
-  static const Color leafGreen = Color(0xFF8AEB86);
-  static const Color darkTeal = Color(0xFF1C7043);
-  static const Color fieldFill = Color(0xFFF3EEDD);
+  static const Color pureWhite = Colors.white;
+  static const Color textDark = Color(0xFF1A1A1A);
+  static const Color textGray = Color(0xFF6B6B6B);
+  static const Color primaryGreen = Color(0xFF1B7A43);
+  static const Color lightGreenBg = Color(0xFFE7F4EC);
+  static const Color borderGray = Color(0xFFE0E0E0);
+  static const Color sectionFill = Color(0xFFF7F8F6);
 
   final formKey = GlobalKey<FormState>();
   late final TextEditingController emailController;
@@ -49,23 +50,23 @@ class SignInScreenState extends ConsumerState<SignInScreen> {
   }) {
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(color: darkTeal, fontWeight: FontWeight.w500),
-      prefixIcon: Icon(icon, color: darkTeal, size: 20),
+      labelStyle: const TextStyle(color: textGray, fontWeight: FontWeight.w500),
+      prefixIcon: Icon(icon, color: primaryGreen, size: 20),
       suffixIcon: suffixIcon,
       filled: true,
-      fillColor: fieldFill,
+      fillColor: sectionFill,
       contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
-        borderSide: BorderSide.none,
+        borderSide: BorderSide(color: borderGray, width: 1),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
-        borderSide: BorderSide.none,
+        borderSide: BorderSide(color: borderGray, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(color: vibrantGreen, width: 1.6),
+        borderSide: const BorderSide(color: primaryGreen, width: 1.6),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
@@ -135,7 +136,7 @@ class SignInScreenState extends ConsumerState<SignInScreen> {
     final authState = ref.watch(authNotifierProvider);
 
     return Scaffold(
-      backgroundColor: appBackground,
+      backgroundColor: pureWhite,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 24),
@@ -145,41 +146,44 @@ class SignInScreenState extends ConsumerState<SignInScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 24),
-                Container(
-                  width: 76,
-                  height: 76,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: const LinearGradient(
-                      colors: [vibrantGreen, leafGreen],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+               Center(
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: lightGreenBg,
+                      border: Border.all(color: borderGray, width: 1),
+                      boxShadow: [
+                        BoxShadow(
+                          color: primaryGreen.withOpacity(0.15),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: vibrantGreen.withOpacity(0.3),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
+                    child: const Icon(
+                      Icons.eco_rounded,
+                      size: 54,
+                      color: primaryGreen,
+                    ),
                   ),
-                  child: const Icon(Icons.eco_rounded, size: 42, color: Colors.white),
                 ),
                 const SizedBox(height: 24),
                 const Text(
                   'Welcome back',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: darkText),
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: textDark),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   'Sign in to continue your green journey.',
-                  style: TextStyle(fontSize: 14, color: darkTeal.withOpacity(0.85), fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 14, color: textGray, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 32),
                 TextFormField(
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(color: darkText),
+                  style: const TextStyle(color: textDark),
                   decoration: buildInputDecoration(label: 'Email', icon: Icons.mail_outline_rounded),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) return 'Enter your email';
@@ -191,14 +195,14 @@ class SignInScreenState extends ConsumerState<SignInScreen> {
                 TextFormField(
                   controller: passwordController,
                   obscureText: obscurePassword,
-                  style: const TextStyle(color: darkText),
+                  style: const TextStyle(color: textDark),
                   decoration: buildInputDecoration(
                     label: 'Password',
                     icon: Icons.lock_outline_rounded,
                     suffixIcon: IconButton(
                       icon: Icon(
                         obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                        color: darkTeal,
+                        color: textGray,
                         size: 20,
                       ),
                       onPressed: () => setState(() => obscurePassword = !obscurePassword),
@@ -216,7 +220,7 @@ class SignInScreenState extends ConsumerState<SignInScreen> {
                     onPressed: () {
                       // TODO: Navigate to forgot password flow
                     },
-                    child: const Text('Forgot password?', style: TextStyle(color: darkTeal, fontWeight: FontWeight.w600, fontSize: 13)),
+                    child: const Text('Forgot password?', style: TextStyle(color: primaryGreen, fontWeight: FontWeight.w600, fontSize: 13)),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -225,7 +229,7 @@ class SignInScreenState extends ConsumerState<SignInScreen> {
                   height: 56,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: vibrantGreen,
+                      backgroundColor: primaryGreen,
                       elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                     ),
@@ -243,7 +247,7 @@ class SignInScreenState extends ConsumerState<SignInScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Don't have an account? ", style: TextStyle(color: darkText, fontSize: 13)),
+                    const Text("Don't have an account? ", style: TextStyle(color: textGray, fontSize: 13)),
                     GestureDetector(
                       onTap: () async {
                         final email = await Navigator.push<String>(
@@ -254,19 +258,19 @@ class SignInScreenState extends ConsumerState<SignInScreen> {
                           setState(() => emailController.text = email);
                         }
                       },
-                      child: const Text('Sign up', style: TextStyle(color: vibrantGreen, fontWeight: FontWeight.bold, fontSize: 13)),
+                      child: const Text('Sign up', style: TextStyle(color: primaryGreen, fontWeight: FontWeight.bold, fontSize: 13)),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    Expanded(child: Divider(color: const Color(0xFFDDD6C2))),
+                    Expanded(child: Divider(color: borderGray)),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Text('or', style: TextStyle(color: darkTeal.withOpacity(0.7), fontSize: 12)),
+                      child: Text('or', style: TextStyle(color: textGray, fontSize: 12)),
                     ),
-                    Expanded(child: Divider(color: const Color(0xFFDDD6C2))),
+                    Expanded(child: Divider(color: borderGray)),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -275,7 +279,8 @@ class SignInScreenState extends ConsumerState<SignInScreen> {
                   height: 52,
                   child: OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: darkTeal, width: 1.4),
+                      backgroundColor: sectionFill,
+                      side: BorderSide(color: borderGray, width: 1.2),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
                     ),
                     onPressed: () {
@@ -284,8 +289,8 @@ class SignInScreenState extends ConsumerState<SignInScreen> {
                         MaterialPageRoute(builder: (context) => const AdminSignInScreen()),
                       );
                     },
-                    icon: const Icon(Icons.admin_panel_settings_outlined, color: darkTeal, size: 20),
-                    label: const Text('Login as admin', style: TextStyle(color: darkTeal, fontWeight: FontWeight.w600, fontSize: 14)),
+                    icon: const Icon(Icons.admin_panel_settings_outlined, color: textDark, size: 20),
+                    label: const Text('Login as admin', style: TextStyle(color: textDark, fontWeight: FontWeight.w600, fontSize: 14)),
                   ),
                 ),
               ],

@@ -6,6 +6,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../providers/add_product_providers.dart';
 import '../providers/dashboard_providers.dart';
 import '../../core/utils/eco_score.dart';
+import '../../core/constants/categories.dart';
 
 class AddProductScreen extends ConsumerStatefulWidget {
   final String storeId;
@@ -31,11 +32,11 @@ class AddProductScreenState extends ConsumerState<AddProductScreen> {
   final formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   final brandController = TextEditingController();
-  final categoryController = TextEditingController();
   final descriptionController = TextEditingController();
   final priceController = TextEditingController();
 
   File? productImage;
+  String? selectedCategory;
 
   String material = 'Recycled material';
   String reusable = 'Yes';
@@ -55,7 +56,6 @@ class AddProductScreenState extends ConsumerState<AddProductScreen> {
   void dispose() {
     nameController.dispose();
     brandController.dispose();
-    categoryController.dispose();
     descriptionController.dispose();
     priceController.dispose();
     super.dispose();
@@ -102,6 +102,55 @@ class AddProductScreenState extends ConsumerState<AddProductScreen> {
     );
   }
 
+  Widget buildBrandAutocomplete(List<String> existingBrands) {
+    return Autocomplete<String>(
+      optionsBuilder: (textEditingValue) {
+        if (textEditingValue.text.isEmpty) return existingBrands;
+        return existingBrands.where(
+          (brand) => brand.toLowerCase().contains(textEditingValue.text.toLowerCase()),
+        );
+      },
+      onSelected: (selection) => brandController.text = selection,
+      fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+        // Keep our own controller in sync so handleSave can read it
+        // whether the admin picked a suggestion or just typed freely.
+        controller.addListener(() => brandController.text = controller.text);
+        return TextFormField(
+          controller: controller,
+          focusNode: focusNode,
+          style: const TextStyle(color: darkText),
+          decoration: buildInputDecoration(
+            label: 'Brand (optional — pick existing or type new)',
+            icon: Icons.label_outline,
+          ),
+        );
+      },
+      optionsViewBuilder: (context, onSelected, options) {
+        return Align(
+          alignment: Alignment.topLeft,
+          child: Material(
+            elevation: 4,
+            borderRadius: BorderRadius.circular(12),
+            color: fieldFill,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 200),
+              child: ListView(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                children: options.map((brand) {
+                  return ListTile(
+                    title: Text(brand, style: const TextStyle(color: darkText)),
+                    onTap: () => onSelected(brand),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> pickImage() async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
@@ -118,13 +167,19 @@ class AddProductScreenState extends ConsumerState<AddProductScreen> {
       );
       return;
     }
+    if (selectedCategory == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a category')),
+      );
+      return;
+    }
 
     await ref.read(addProductNotifierProvider.notifier).saveProduct(
           storeId: widget.storeId,
           imageFile: productImage!,
           name: nameController.text.trim(),
           brand: brandController.text.trim().isEmpty ? null : brandController.text.trim(),
-          category: categoryController.text.trim().isEmpty ? null : categoryController.text.trim(),
+          category: selectedCategory!,
           description: descriptionController.text.trim().isEmpty ? null : descriptionController.text.trim(),
           price: double.tryParse(priceController.text.trim()) ?? 0,
           material: material,
@@ -202,6 +257,7 @@ class AddProductScreenState extends ConsumerState<AddProductScreen> {
   @override
   Widget build(BuildContext context) {
     final saveState = ref.watch(addProductNotifierProvider);
+    final existingBrandsAsync = ref.watch(existingBrandsProvider);
 
     return Scaffold(
       backgroundColor: appBackground,
@@ -253,16 +309,31 @@ class AddProductScreenState extends ConsumerState<AddProductScreen> {
                   validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter product name' : null,
                 ),
                 const SizedBox(height: 16),
-                TextFormField(
-                  controller: brandController,
+                DropdownButtonFormField<String>(
+                  value: selectedCategory,
+                  decoration: buildInputDecoration(label: 'Category', icon: Icons.category_outlined),
+                  dropdownColor: fieldFill,
                   style: const TextStyle(color: darkText),
-                  decoration: buildInputDecoration(label: 'Brand (optional)', icon: Icons.label_outline),
+                  hint: const Text('Select a category'),
+                  items: productCategories
+                      .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                      .toList(),
+                  onChanged: (v) => setState(() => selectedCategory = v),
+                  validator: (v) => v == null ? 'Select a category' : null,
                 ),
                 const SizedBox(height: 16),
-                TextFormField(
-                  controller: categoryController,
-                  style: const TextStyle(color: darkText),
-                  decoration: buildInputDecoration(label: 'Category (optional)', icon: Icons.category_outlined),
+                existingBrandsAsync.when(
+                  loading: () => TextFormField(
+                    controller: brandController,
+                    style: const TextStyle(color: darkText),
+                    decoration: buildInputDecoration(label: 'Brand (optional)', icon: Icons.label_outline),
+                  ),
+                  error: (error, stack) => TextFormField(
+                    controller: brandController,
+                    style: const TextStyle(color: darkText),
+                    decoration: buildInputDecoration(label: 'Brand (optional)', icon: Icons.label_outline),
+                  ),
+                  data: (existingBrands) => buildBrandAutocomplete(existingBrands),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(

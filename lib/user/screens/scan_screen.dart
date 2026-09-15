@@ -12,11 +12,13 @@ class ScanScreen extends ConsumerStatefulWidget {
 }
 
 class ScanScreenState extends ConsumerState<ScanScreen> {
-  static const Color appBackground = Color(0xFFFDF9F0);
-  static const Color darkText = Color(0xFF2F4F4F);
-  static const Color vibrantGreen = Color(0xFF24AC5D);
-  static const Color darkTeal = Color(0xFF1C7043);
-  static const Color fieldFill = Color(0xFFF3EEDD);
+  static const Color pureWhite = Colors.white;
+  static const Color textDark = Color(0xFF1A1A1A);
+  static const Color textGray = Color(0xFF6B6B6B);
+  static const Color primaryGreen = Color(0xFF1B7A43);
+  static const Color lightGreenBg = Color(0xFFE7F4EC);
+  static const Color borderGray = Color(0xFFE0E0E0);
+  static const Color sectionFill = Color(0xFFF7F8F6);
 
   final manualIdController = TextEditingController();
   final scannerController = MobileScannerController();
@@ -73,18 +75,18 @@ class ScanScreenState extends ConsumerState<ScanScreen> {
     final lookupState = ref.watch(productLookupNotifierProvider);
 
     return Scaffold(
-      backgroundColor: appBackground,
+      backgroundColor: pureWhite,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
           children: [
             Row(
               children: const [
-                Icon(Icons.qr_code_scanner_rounded, color: vibrantGreen, size: 24),
+                Icon(Icons.qr_code_scanner_rounded, color: primaryGreen, size: 24),
                 SizedBox(width: 8),
                 Text(
                   'Scan & Save',
-                  style: TextStyle(color: darkText, fontWeight: FontWeight.bold, fontSize: 22),
+                  style: TextStyle(color: textDark, fontWeight: FontWeight.bold, fontSize: 22),
                 ),
               ],
             ),
@@ -113,7 +115,7 @@ class ScanScreenState extends ConsumerState<ScanScreen> {
                           width: 200,
                           height: 200,
                           decoration: BoxDecoration(
-                            border: Border.all(color: vibrantGreen, width: 2),
+                            border: Border.all(color: primaryGreen, width: 2),
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
@@ -127,13 +129,13 @@ class ScanScreenState extends ConsumerState<ScanScreen> {
             const Center(
               child: Text(
                 'Point your camera at a product QR code',
-                style: TextStyle(color: darkTeal, fontSize: 13),
+                style: TextStyle(color: textGray, fontSize: 13),
               ),
             ),
             const SizedBox(height: 24),
             const Text(
               'Or enter product ID manually',
-              style: TextStyle(color: darkText, fontWeight: FontWeight.w600),
+              style: TextStyle(color: textDark, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 10),
             Row(
@@ -141,11 +143,11 @@ class ScanScreenState extends ConsumerState<ScanScreen> {
                 Expanded(
                   child: TextField(
                     controller: manualIdController,
-                    style: const TextStyle(color: darkText),
+                    style: const TextStyle(color: textDark),
                     decoration: InputDecoration(
                       hintText: 'Enter product ID',
                       filled: true,
-                      fillColor: fieldFill,
+                      fillColor: sectionFill,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
@@ -160,7 +162,7 @@ class ScanScreenState extends ConsumerState<ScanScreen> {
                   width: 52,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: vibrantGreen,
+                      backgroundColor: primaryGreen,
                       elevation: 0,
                       padding: EdgeInsets.zero,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -174,11 +176,11 @@ class ScanScreenState extends ConsumerState<ScanScreen> {
             const SizedBox(height: 32),
             Row(
               children: const [
-                Icon(Icons.favorite_rounded, color: vibrantGreen, size: 20),
+                Icon(Icons.favorite_rounded, color: primaryGreen, size: 20),
                 SizedBox(width: 8),
                 Text(
                   'My Wishlist',
-                  style: TextStyle(color: darkText, fontWeight: FontWeight.bold, fontSize: 18),
+                  style: TextStyle(color: textDark, fontWeight: FontWeight.bold, fontSize: 18),
                 ),
               ],
             ),
@@ -186,15 +188,15 @@ class ScanScreenState extends ConsumerState<ScanScreen> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 16),
-              decoration: BoxDecoration(color: fieldFill, borderRadius: BorderRadius.circular(18)),
+              decoration: BoxDecoration(color: sectionFill, borderRadius: BorderRadius.circular(18)),
               child: Column(
                 children: [
-                  Icon(Icons.favorite_border_rounded, color: darkTeal.withOpacity(0.6), size: 30),
+                  Icon(Icons.favorite_border_rounded, color: textGray.withOpacity(0.6), size: 30),
                   const SizedBox(height: 10),
                   Text(
                     'Products you save will show up here.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: darkTeal.withOpacity(0.8), fontSize: 13),
+                    style: TextStyle(color: textGray.withOpacity(0.8), fontSize: 13),
                   ),
                 ],
               ),

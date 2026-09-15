@@ -72,11 +72,18 @@ class AdminDashboardScreen extends ConsumerWidget {
                 for (final store in stores)
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.storefront_rounded,
-                        color: vibrantGreen),
+                    leading: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: vibrantGreen.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.storefront_rounded, color: vibrantGreen, size: 20),
+                    ),
                     title: Text(
                       store.name,
-                      style: const TextStyle(color: darkText),
+                      style: const TextStyle(color: darkText, fontWeight: FontWeight.w600),
                     ),
                     onTap: () {
                       Navigator.pop(context);
@@ -114,197 +121,250 @@ class AdminDashboardScreen extends ConsumerWidget {
         ref.invalidate(recentActivityProvider);
       },
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+        padding: EdgeInsets.zero,
         children: [
-          Text(
-            '${buildGreeting()}, ${adminName ?? 'Admin'} ',
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: darkText,
-            ),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            "Here's your EcoWise overview.",
-            style: TextStyle(
-              fontSize: 14,
-              color: darkTeal,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          statsAsync.when(
-            loading: () => const Padding(
-              padding: EdgeInsets.symmetric(vertical: 32),
-              child: Center(
-                child: CircularProgressIndicator(color: vibrantGreen),
+          // ── Header: greeting on a gradient hero, same vibrantGreen
+          // (just two opacity steps of it — no new colors introduced).
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [vibrantGreen, vibrantGreen.withOpacity(0.82)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
+              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
             ),
-            error: (error, stack) => const Text(
-              'Could not load dashboard stats.',
-              style: TextStyle(color: darkText),
-            ),
-            data: (stats) => GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 14,
-              crossAxisSpacing: 14,
-              childAspectRatio: 1.65,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                buildStatCard(
-                  icon: Icons.storefront_rounded,
-                  label: 'Stores',
-                  value: '${stats.storeCount}',
-                ),
-                buildStatCard(
-                  icon: Icons.inventory_2_outlined,
-                  label: 'Products',
-                  value: '${stats.productCount}',
-                ),
-                buildStatCard(
-                  icon: Icons.people_outline_rounded,
-                  label: 'Users',
-                  value: '${stats.userCount}',
-                ),
-                buildStatCard(
-                  icon: Icons.qr_code_scanner_rounded,
-                  label: 'Scans',
-                  value: '${stats.scanCount}',
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 28),
-          const Text(
-            'Quick actions',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: darkText,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: buildActionButton(
-                  icon: Icons.add_business_rounded,
-                  label: 'Add store',
-                  filled: true,
-                  onTap: () => openAddStoreScreen(context),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: buildActionButton(
-                  icon: Icons.add_box_outlined,
-                  label: 'Add product',
-                  filled: false,
-                  onTap: () {
-                    final stores = storesAsync.maybeWhen(
-                      data: (data) => data,
-                      orElse: () => <StoreOverview>[],
-                    );
-                    showSelectStoreSheet(context, stores);
-                  },
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 28),
-          const Text(
-            'Recent activity',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: darkText,
-            ),
-          ),
-          const SizedBox(height: 12),
-          activityAsync.when(
-            loading: () => const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
-              child: Center(
-                child: CircularProgressIndicator(color: vibrantGreen),
-              ),
-            ),
-            error: (error, stack) => const Text(
-              'Could not load recent activity.',
-              style: TextStyle(color: darkText),
-            ),
-            data: (activities) {
-              if (activities.isEmpty) {
-                return buildEmptyState(
-                  icon: Icons.history_rounded,
-                  message: 'Nothing has happened yet — activity will show up here.',
-                );
-              }
-              return Column(
-                children: [
-                  for (final activity in activities)
+                Row(
+                  children: [
                     Container(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      padding: const EdgeInsets.all(14),
+                      width: 44,
+                      height: 44,
                       decoration: BoxDecoration(
-                        color: cardFill,
-                        borderRadius: BorderRadius.circular(16),
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(0.18),
                       ),
-                      child: Row(
+                      child: const Icon(Icons.admin_panel_settings_rounded, color: Colors.white, size: 24),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
+                          Text(
+                            '${buildGreeting()}, ${adminName ?? 'Admin'}',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
                               color: Colors.white,
-                            ),
-                            child: Icon(
-                              iconForActivity(activity.type),
-                              color: darkTeal,
-                              size: 20,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  activity.title,
-                                  style: const TextStyle(
-                                    color: darkText,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                if (activity.subtitle != null)
-                                  Text(
-                                    activity.subtitle!,
-                                    style: const TextStyle(
-                                      color: darkTeal,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                              ],
                             ),
                           ),
                           Text(
-                            activity.timeAgo,
+                            "Here's your EcoWise overview.",
                             style: TextStyle(
-                              color: darkTeal.withOpacity(0.7),
-                              fontSize: 12,
+                              fontSize: 13,
+                              color: Colors.white.withOpacity(0.85),
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
                       ),
                     ),
-                ],
-              );
-            },
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                statsAsync.when(
+                  loading: () => const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 32),
+                    child: Center(
+                      child: CircularProgressIndicator(color: vibrantGreen),
+                    ),
+                  ),
+                  error: (error, stack) => const Text(
+                    'Could not load dashboard stats.',
+                    style: TextStyle(color: darkText),
+                  ),
+                  data: (stats) => GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    mainAxisSpacing: 14,
+                    crossAxisSpacing: 14,
+                    childAspectRatio: 1.65,
+                    children: [
+                      buildStatCard(
+                        icon: Icons.storefront_rounded,
+                        label: 'Stores',
+                        value: '${stats.storeCount}',
+                      ),
+                      buildStatCard(
+                        icon: Icons.inventory_2_outlined,
+                        label: 'Products',
+                        value: '${stats.productCount}',
+                      ),
+                      buildStatCard(
+                        icon: Icons.people_outline_rounded,
+                        label: 'Users',
+                        value: '${stats.userCount}',
+                      ),
+                      buildStatCard(
+                        icon: Icons.qr_code_scanner_rounded,
+                        label: 'Scans',
+                        value: '${stats.scanCount}',
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 28),
+                const Text(
+                  'Quick actions',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: darkText,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: buildActionButton(
+                        icon: Icons.add_business_rounded,
+                        label: 'Add store',
+                        filled: true,
+                        onTap: () => openAddStoreScreen(context),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: buildActionButton(
+                        icon: Icons.add_box_outlined,
+                        label: 'Add product',
+                        filled: false,
+                        onTap: () {
+                          final stores = storesAsync.maybeWhen(
+                            data: (data) => data,
+                            orElse: () => <StoreOverview>[],
+                          );
+                          showSelectStoreSheet(context, stores);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 28),
+                const Text(
+                  'Recent activity',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: darkText,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                activityAsync.when(
+                  loading: () => const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    child: Center(
+                      child: CircularProgressIndicator(color: vibrantGreen),
+                    ),
+                  ),
+                  error: (error, stack) => const Text(
+                    'Could not load recent activity.',
+                    style: TextStyle(color: darkText),
+                  ),
+                  data: (activities) {
+                    if (activities.isEmpty) {
+                      return buildEmptyState(
+                        icon: Icons.history_rounded,
+                        message: 'Nothing has happened yet — activity will show up here.',
+                      );
+                    }
+                    return Column(
+                      children: [
+                        for (final activity in activities)
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: cardFill,
+                              borderRadius: BorderRadius.circular(18),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: darkTeal.withOpacity(0.06),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 42,
+                                  height: 42,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white,
+                                  ),
+                                  child: Icon(
+                                    iconForActivity(activity.type),
+                                    color: darkTeal,
+                                    size: 20,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        activity.title,
+                                        style: const TextStyle(
+                                          color: darkText,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      if (activity.subtitle != null)
+                                        Text(
+                                          activity.subtitle!,
+                                          style: const TextStyle(
+                                            color: darkTeal,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                Text(
+                                  activity.timeAgo,
+                                  style: TextStyle(
+                                    color: darkTeal.withOpacity(0.7),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -339,18 +399,33 @@ class AdminDashboardScreen extends ConsumerWidget {
     required String value,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: cardFill,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: darkTeal.withOpacity(0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: vibrantGreen, size: 22),
-          const SizedBox(height: 6),
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: vibrantGreen.withOpacity(0.14),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: vibrantGreen, size: 18),
+          ),
+          const SizedBox(height: 8),
           Text(
             value,
             style: const TextStyle(
@@ -381,14 +456,14 @@ class AdminDashboardScreen extends ConsumerWidget {
     required VoidCallback onTap,
   }) {
     return SizedBox(
-      height: 52,
+      height: 56,
       child: filled
           ? ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: vibrantGreen,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(18),
                 ),
               ),
               onPressed: onTap,
@@ -405,7 +480,7 @@ class AdminDashboardScreen extends ConsumerWidget {
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: darkTeal, width: 1.4),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(18),
                 ),
               ),
               onPressed: onTap,

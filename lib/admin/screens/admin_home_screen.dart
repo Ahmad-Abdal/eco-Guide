@@ -3,6 +3,7 @@ import 'admin_dashboard_screen.dart';
 import 'admin_stores_screen.dart';
 import 'admin_users_screen.dart';
 import 'admin_analytics_screen.dart';
+import '../../user/widgets/rounded_bottom_nav.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({Key? key}) : super(key: key);
@@ -12,9 +13,7 @@ class AdminHomeScreen extends StatefulWidget {
 }
 
 class AdminHomeScreenState extends State<AdminHomeScreen> {
-  static const Color appBackground = Color(0xFFFDF9F0);
-  static const Color vibrantGreen = Color(0xFF24AC5D);
-  static const Color darkTeal = Color(0xFF1C7043);
+  static const Color pureWhite = Colors.white;
 
   int selectedIndex = 0;
 
@@ -22,49 +21,35 @@ class AdminHomeScreenState extends State<AdminHomeScreen> {
     setState(() => selectedIndex = index);
   }
 
+  static const tabs = [
+    AdminDashboardScreen(),
+    AdminStoresScreen(),
+    AdminUsersScreen(),
+    AdminAnalyticsScreen(),
+  ];
+
+  static const navItems = [
+    NavItemData(icon: Icons.home_rounded, label: 'Dashboard'),
+    NavItemData(icon: Icons.storefront_rounded, label: 'Stores'),
+    NavItemData(icon: Icons.people_rounded, label: 'Users'),
+    NavItemData(icon: Icons.bar_chart_rounded, label: 'Analytics'),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    final tabs = [
-      const AdminDashboardScreen(),
-      const AdminStoresScreen(),
-      const AdminUsersScreen(),
-      const AdminAnalyticsScreen(),
-    ];
-
     return Scaffold(
-      backgroundColor: appBackground,
+      backgroundColor: pureWhite,
       body: SafeArea(
+        bottom: false,
         child: IndexedStack(
           index: selectedIndex,
           children: tabs,
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: selectedIndex,
+      bottomNavigationBar: RoundedBottomNav(
+        selectedIndex: selectedIndex,
         onTap: goToTab,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: vibrantGreen,
-        unselectedItemColor: darkTeal.withOpacity(0.5),
-        showUnselectedLabels: true,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_rounded),
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.storefront_rounded),
-            label: 'Stores',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people_rounded),
-            label: 'Users',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart_rounded),
-            label: 'Analytics',
-          ),
-        ],
+        items: navItems,
       ),
     );
   }

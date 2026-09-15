@@ -5,26 +5,39 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class UserProfile {
   final String id;
   final String name;
+  final String? email;
   final String? avatarUrl;
   final String? city;
   final String? bio;
+  final DateTime? createdAt;
 
   const UserProfile({
     required this.id,
     required this.name,
+    this.email,
     this.avatarUrl,
     this.city,
     this.bio,
+    this.createdAt,
   });
 
   factory UserProfile.fromMap(Map<String, dynamic> map) => UserProfile(
         id: map['id'] as String,
         name: map['name'] as String,
+        email: map['email'] as String?,
         avatarUrl: map['avatar_url'] as String?,
         city: map['city'] as String?,
         bio: map['bio'] as String?,
+        createdAt: map['created_at'] != null ? DateTime.parse(map['created_at'] as String) : null,
       );
 }
+
+/// All registered users — for the admin Users screen.
+final allUsersProvider = FutureProvider.autoDispose<List<UserProfile>>((ref) async {
+  final supabase = Supabase.instance.client;
+  final data = await supabase.from('profiles').select().order('created_at', ascending: false);
+  return (data as List).map((e) => UserProfile.fromMap(e)).toList();
+});
 
 /// Null → no profile row yet (first-time user, needs setup screen).
 /// Non-null → returning user, skip straight to home.
@@ -72,6 +85,7 @@ class ProfileSetupNotifier extends Notifier<ProfileSetupState> {
     state = state.copyWith(isSaving: true, errorMessage: null);
     try {
       final userId = supabase.auth.currentUser?.id;
+      final userEmail = supabase.auth.currentUser?.email;
       if (userId == null) throw Exception('No signed-in user');
 
       String? avatarUrl;
@@ -89,14 +103,10 @@ class ProfileSetupNotifier extends Notifier<ProfileSetupState> {
       await supabase.from('profiles').upsert({
         'id': userId,
         'name': name,
+        'email': userEmail,
         if (avatarUrl != null) 'avatar_url': avatarUrl,
         'city': city,
         'bio': bio,
-        // Marks setup as actually finished — this is what sign_in_screen.dart
-        // checks to decide whether to show ProfileSetupScreen again. Without
-        // this, the stub row created at sign-up (for the dashboard's Users
-        // count) would look identical to a completed profile.
-        'profile_completed': true,
       });
 
       state = state.copyWith(isSaving: false, isSaved: true);

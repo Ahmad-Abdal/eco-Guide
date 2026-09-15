@@ -43,7 +43,7 @@ class AddProductNotifier extends Notifier<AddProductState> {
     required File imageFile,
     required String name,
     String? brand,
-    String? category,
+    required String category,
     String? description,
     required double price,
     required String material,
@@ -115,3 +115,28 @@ final addProductNotifierProvider =
     NotifierProvider.autoDispose<AddProductNotifier, AddProductState>(
   AddProductNotifier.new,
 );
+
+// Distinct brand names already used across existing products — feeds
+// the Brand autocomplete so the admin can pick a prior brand instead
+// of retyping it (and risking a slightly different spelling), while
+// still being free to type a brand-new one.
+final existingBrandsProvider = FutureProvider.autoDispose<List<String>>((ref) async {
+  try {
+    final response = await Supabase.instance.client
+        .from('products')
+        .select('brand')
+        .not('brand', 'is', null);
+
+    final brands = (response as List<dynamic>)
+        .map((row) => row['brand'] as String?)
+        .whereType<String>()
+        .map((b) => b.trim())
+        .where((b) => b.isNotEmpty)
+        .toSet()
+        .toList();
+    brands.sort();
+    return brands;
+  } catch (_) {
+    return [];
+  }
+});

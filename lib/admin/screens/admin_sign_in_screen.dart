@@ -11,11 +11,13 @@ class AdminSignInScreen extends ConsumerStatefulWidget {
 }
 
 class AdminSignInScreenState extends ConsumerState<AdminSignInScreen> {
-  static const Color appBackground = Color(0xFFFDF9F0);
-  static const Color darkText = Color(0xFF2F4F4F);
-  static const Color vibrantGreen = Color(0xFF24AC5D);
-  static const Color darkTeal = Color(0xFF1C7043);
-  static const Color fieldFill = Color(0xFFF3EEDD);
+  static const Color pureWhite = Colors.white;
+  static const Color textDark = Color(0xFF1A1A1A);
+  static const Color textGray = Color(0xFF6B6B6B);
+  static const Color primaryGreen = Color(0xFF1B7A43);
+  static const Color lightGreenBg = Color(0xFFE7F4EC);
+  static const Color borderGray = Color(0xFFE0E0E0);
+  static const Color sectionFill = Color(0xFFF7F8F6);
 
   final formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
@@ -36,19 +38,27 @@ class AdminSignInScreenState extends ConsumerState<AdminSignInScreen> {
   }) {
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(color: darkTeal),
-      prefixIcon: Icon(icon, color: darkTeal),
+      labelStyle: const TextStyle(color: textGray, fontWeight: FontWeight.w500),
+      prefixIcon: Icon(icon, color: primaryGreen, size: 20),
       suffixIcon: suffixIcon,
       filled: true,
-      fillColor: fieldFill,
+      fillColor: sectionFill,
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide.none,
+        borderSide: BorderSide(color: borderGray, width: 1),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: borderGray, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: vibrantGreen, width: 1.5),
+        borderSide: const BorderSide(color: primaryGreen, width: 1.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 1.2),
       ),
     );
   }
@@ -83,7 +93,7 @@ class AdminSignInScreenState extends ConsumerState<AdminSignInScreen> {
     final authState = ref.watch(adminAuthNotifierProvider);
 
     return Scaffold(
-      backgroundColor: appBackground,
+      backgroundColor: pureWhite,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
@@ -95,20 +105,30 @@ class AdminSignInScreenState extends ConsumerState<AdminSignInScreen> {
                 IconButton(
                   padding: EdgeInsets.zero,
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.arrow_back_rounded, color: darkTeal),
+                  icon: const Icon(Icons.arrow_back_rounded, color: textDark),
                 ),
                 const SizedBox(height: 8),
-                Container(
-                  width: 72,
-                  height: 72,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: darkTeal,
-                  ),
-                  child: const Icon(
-                    Icons.admin_panel_settings_rounded,
-                    size: 38,
-                    color: Colors.white,
+                Center(
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: lightGreenBg,
+                      border: Border.all(color: borderGray, width: 1),
+                      boxShadow: [
+                        BoxShadow(
+                          color: primaryGreen.withOpacity(0.15),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.admin_panel_settings_rounded,
+                      size: 52,
+                      color: primaryGreen,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -117,7 +137,7 @@ class AdminSignInScreenState extends ConsumerState<AdminSignInScreen> {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: darkText,
+                    color: textDark,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -125,7 +145,7 @@ class AdminSignInScreenState extends ConsumerState<AdminSignInScreen> {
                   'Restricted access for the EcoWise admin account.',
                   style: TextStyle(
                     fontSize: 14,
-                    color: darkTeal,
+                    color: textGray,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -133,7 +153,7 @@ class AdminSignInScreenState extends ConsumerState<AdminSignInScreen> {
                 TextFormField(
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(color: darkText),
+                  style: const TextStyle(color: textDark),
                   decoration: buildInputDecoration(
                     label: 'Admin email',
                     icon: Icons.mail_outline_rounded,
@@ -152,7 +172,7 @@ class AdminSignInScreenState extends ConsumerState<AdminSignInScreen> {
                 TextFormField(
                   controller: passwordController,
                   obscureText: obscurePassword,
-                  style: const TextStyle(color: darkText),
+                  style: const TextStyle(color: textDark),
                   decoration: buildInputDecoration(
                     label: 'Password',
                     icon: Icons.lock_outline_rounded,
@@ -161,7 +181,7 @@ class AdminSignInScreenState extends ConsumerState<AdminSignInScreen> {
                         obscurePassword
                             ? Icons.visibility_off_outlined
                             : Icons.visibility_outlined,
-                        color: darkTeal,
+                        color: textGray,
                       ),
                       onPressed: () {
                         setState(() => obscurePassword = !obscurePassword);
@@ -181,7 +201,7 @@ class AdminSignInScreenState extends ConsumerState<AdminSignInScreen> {
                   height: 56,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: darkTeal,
+                      backgroundColor: primaryGreen,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(28),
@@ -214,7 +234,7 @@ class AdminSignInScreenState extends ConsumerState<AdminSignInScreen> {
                     'Only one admin account exists for this app.',
                     style: TextStyle(
                       fontSize: 12,
-                      color: darkTeal.withOpacity(0.7),
+                      color: textGray,
                     ),
                   ),
                 ),

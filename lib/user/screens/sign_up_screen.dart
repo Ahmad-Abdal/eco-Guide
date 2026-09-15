@@ -10,11 +10,13 @@ class SignUpScreen extends ConsumerStatefulWidget {
 }
 
 class SignUpScreenState extends ConsumerState<SignUpScreen> {
-  static const Color appBackground =  Color(0xFFFFFFFF);//Color(0xFFFDF9F0)
-  static const Color darkText = Color(0xFF2F4F4F);
-  static const Color vibrantGreen = Color(0xFF24AC5D);
-  static const Color darkTeal = Color(0xFF1C7043);
-  static const Color fieldFill = Color(0xFFF3EEDD);
+  static const Color pureWhite = Colors.white;
+  static const Color textDark = Color(0xFF1A1A1A);
+  static const Color textGray = Color(0xFF6B6B6B);
+  static const Color primaryGreen = Color(0xFF1B7A43);
+  static const Color lightGreenBg = Color(0xFFE7F4EC);
+  static const Color borderGray = Color(0xFFE0E0E0);
+  static const Color sectionFill = Color(0xFFF7F8F6);
 
   final formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
@@ -40,19 +42,27 @@ class SignUpScreenState extends ConsumerState<SignUpScreen> {
   }) {
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(color: darkTeal),
-      prefixIcon: Icon(icon, color: darkTeal),
+      labelStyle: const TextStyle(color: textGray, fontWeight: FontWeight.w500),
+      prefixIcon: Icon(icon, color: primaryGreen, size: 20),
       suffixIcon: suffixIcon,
       filled: true,
-      fillColor: fieldFill,
+      fillColor: sectionFill,
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide.none,
+        borderSide: BorderSide(color: borderGray, width: 1),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: borderGray, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: vibrantGreen, width: 1.5),
+        borderSide: const BorderSide(color: primaryGreen, width: 1.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 1.2),
       ),
     );
   }
@@ -83,7 +93,7 @@ class SignUpScreenState extends ConsumerState<SignUpScreen> {
     final authState = ref.watch(authNotifierProvider);
 
     return Scaffold(
-      backgroundColor: appBackground,
+      backgroundColor: pureWhite,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
@@ -95,24 +105,30 @@ class SignUpScreenState extends ConsumerState<SignUpScreen> {
                 IconButton(
                   padding: EdgeInsets.zero,
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.arrow_back_rounded, color: darkTeal),
+                  icon: const Icon(Icons.arrow_back_rounded, color: textDark),
                 ),
                 const SizedBox(height: 8),
-                Container(
-                  width: 72,
-                  height: 72,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [vibrantGreen, Color(0xFF8AEB86)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                Center(
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: lightGreenBg,
+                      border: Border.all(color: borderGray, width: 1),
+                      boxShadow: [
+                        BoxShadow(
+                          color: primaryGreen.withOpacity(0.15),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
                     ),
-                  ),
-                  child: const Icon(
-                    Icons.eco_rounded,
-                    size: 40,
-                    color: Colors.white,
+                    child: const Icon(
+                      Icons.eco_rounded,
+                      size: 54,
+                      color: primaryGreen,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -121,7 +137,7 @@ class SignUpScreenState extends ConsumerState<SignUpScreen> {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: darkText,
+                    color: textDark,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -129,14 +145,14 @@ class SignUpScreenState extends ConsumerState<SignUpScreen> {
                   'Join EcoWise and start your green future.',
                   style: TextStyle(
                     fontSize: 14,
-                    color: darkTeal,
+                    color: textGray,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 32),
                 TextFormField(
                   controller: nameController,
-                  style: const TextStyle(color: darkText),
+                  style: const TextStyle(color: textDark),
                   decoration: buildInputDecoration(
                     label: 'Full name',
                     icon: Icons.person_outline_rounded,
@@ -152,7 +168,7 @@ class SignUpScreenState extends ConsumerState<SignUpScreen> {
                 TextFormField(
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(color: darkText),
+                  style: const TextStyle(color: textDark),
                   decoration: buildInputDecoration(
                     label: 'Email',
                     icon: Icons.mail_outline_rounded,
@@ -171,7 +187,7 @@ class SignUpScreenState extends ConsumerState<SignUpScreen> {
                 TextFormField(
                   controller: passwordController,
                   obscureText: obscurePassword,
-                  style: const TextStyle(color: darkText),
+                  style: const TextStyle(color: textDark),
                   decoration: buildInputDecoration(
                     label: 'Password',
                     icon: Icons.lock_outline_rounded,
@@ -180,7 +196,7 @@ class SignUpScreenState extends ConsumerState<SignUpScreen> {
                         obscurePassword
                             ? Icons.visibility_off_outlined
                             : Icons.visibility_outlined,
-                        color: darkTeal,
+                        color: textGray,
                       ),
                       onPressed: () {
                         setState(() => obscurePassword = !obscurePassword);
@@ -201,7 +217,7 @@ class SignUpScreenState extends ConsumerState<SignUpScreen> {
                 TextFormField(
                   controller: confirmPasswordController,
                   obscureText: obscureConfirmPassword,
-                  style: const TextStyle(color: darkText),
+                  style: const TextStyle(color: textDark),
                   decoration: buildInputDecoration(
                     label: 'Confirm password',
                     icon: Icons.lock_outline_rounded,
@@ -210,7 +226,7 @@ class SignUpScreenState extends ConsumerState<SignUpScreen> {
                         obscureConfirmPassword
                             ? Icons.visibility_off_outlined
                             : Icons.visibility_outlined,
-                        color: darkTeal,
+                        color: textGray,
                       ),
                       onPressed: () {
                         setState(() {
@@ -232,7 +248,7 @@ class SignUpScreenState extends ConsumerState<SignUpScreen> {
                   height: 56,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: vibrantGreen,
+                      backgroundColor: primaryGreen,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(28),
@@ -265,14 +281,14 @@ class SignUpScreenState extends ConsumerState<SignUpScreen> {
                   children: [
                     const Text(
                       'Already have an account? ',
-                      style: TextStyle(color: darkText),
+                      style: TextStyle(color: textGray),
                     ),
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
                       child: const Text(
                         'Sign in',
                         style: TextStyle(
-                          color: vibrantGreen,
+                          color: primaryGreen,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

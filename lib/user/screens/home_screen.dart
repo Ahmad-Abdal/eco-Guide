@@ -8,10 +8,13 @@ import 'sign_in_screen.dart';
 class UserHomeScreen extends ConsumerWidget {
   const UserHomeScreen({Key? key}) : super(key: key);
 
-  static const Color darkText = Color(0xFF2F4F4F);
-  static const Color vibrantGreen = Color(0xFF24AC5D);
-  static const Color darkTeal = Color(0xFF1C7043);
-  static const Color cardFill = Color(0xFFF3EEDD);
+  static const Color pureWhite = Colors.white;
+  static const Color textDark = Color(0xFF1A1A1A);
+  static const Color textGray = Color(0xFF6B6B6B);
+  static const Color primaryGreen = Color(0xFF1B7A43);
+  static const Color lightGreenBg = Color(0xFFE7F4EC);
+  static const Color borderGray = Color(0xFFE0E0E0);
+  static const Color sectionFill = Color(0xFFF7F8F6);
 
   static const categories = [
     'Sustainable Fashion',
@@ -24,7 +27,7 @@ class UserHomeScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFFFDF9F0),
+        backgroundColor: pureWhite,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         content: SizedBox(
           width: 260,
@@ -33,29 +36,29 @@ class UserHomeScreen extends ConsumerWidget {
             children: [
               CircleAvatar(
                 radius: 36,
-                backgroundColor: cardFill,
+                backgroundColor: sectionFill,
                 backgroundImage: (profile?.avatarUrl != null)
                     ? NetworkImage(profile!.avatarUrl!)
                     : null,
                 child: profile?.avatarUrl == null
-                    ? const Icon(Icons.person, color: darkTeal, size: 32)
+                    ? const Icon(Icons.person, color: textGray, size: 32)
                     : null,
               ),
               const SizedBox(height: 14),
               Text(
                 profile?.name ?? 'EcoWise user',
-                style: const TextStyle(color: darkText, fontWeight: FontWeight.bold, fontSize: 18),
+                style: const TextStyle(color: textDark, fontWeight: FontWeight.bold, fontSize: 18),
               ),
               if (profile?.city != null) ...[
                 const SizedBox(height: 4),
-                Text(profile!.city!, style: const TextStyle(color: darkTeal, fontSize: 13)),
+                Text(profile!.city!, style: const TextStyle(color: textGray, fontSize: 13)),
               ],
               if (profile?.bio != null) ...[
                 const SizedBox(height: 10),
                 Text(
                   profile!.bio!,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: darkText, fontSize: 13),
+                  style: const TextStyle(color: textDark, fontSize: 13),
                 ),
               ],
               const SizedBox(height: 20),
@@ -99,66 +102,127 @@ class UserHomeScreen extends ConsumerWidget {
     final profileAsync = ref.watch(currentProfileProvider);
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(22, 16, 22, 28),
+      padding: EdgeInsets.zero,
       children: [
-        Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: const BoxDecoration(shape: BoxShape.circle, color: vibrantGreen),
-              child: const Icon(Icons.eco_rounded, color: Colors.white, size: 24),
+        Container(
+          padding: const EdgeInsets.fromLTRB(22, 20, 22, 28),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [primaryGreen, Color(0xFF2FA362)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            const SizedBox(width: 10),
-            const Text('EcoWise', style: TextStyle(color: darkText, fontWeight: FontWeight.bold, fontSize: 20)),
-            const Spacer(),
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: cardFill, borderRadius: BorderRadius.circular(14)),
-              child: const Icon(Icons.notifications_none_rounded, color: darkTeal, size: 24),
-            ),
-            const SizedBox(width: 12),
-            GestureDetector(
-              onTap: () => openProfileDialog(context, ref, profileAsync.value),
-              child: CircleAvatar(
-                radius: 22,
-                backgroundColor: cardFill,
-                backgroundImage: (profileAsync.value?.avatarUrl != null)
-                    ? NetworkImage(profileAsync.value!.avatarUrl!)
-                    : null,
-                child: profileAsync.value?.avatarUrl == null
-                    ? const Icon(Icons.person, color: darkTeal, size: 24)
-                    : null,
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.18),
+                    ),
+                    child: const Icon(Icons.eco_rounded, color: Colors.white, size: 24),
+                  ),
+                  const SizedBox(width: 10),
+                  const Text('EcoWise', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20)),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(color: Colors.white.withOpacity(0.18), borderRadius: BorderRadius.circular(14)),
+                    child: const Icon(Icons.notifications_none_rounded, color: Colors.white, size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  GestureDetector(
+                    onTap: () => openProfileDialog(context, ref, profileAsync.value),
+                    child: CircleAvatar(
+                      radius: 22,
+                      backgroundColor: Colors.white,
+                      backgroundImage: (profileAsync.value?.avatarUrl != null)
+                          ? NetworkImage(profileAsync.value!.avatarUrl!)
+                          : null,
+                      child: profileAsync.value?.avatarUrl == null
+                          ? const Icon(Icons.person, color: primaryGreen, size: 24)
+                          : null,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 26),
-        Text(
-          'Hello, ${displayName ?? 'there'}!',
-          style: const TextStyle(color: darkText, fontSize: 30, fontWeight: FontWeight.bold, height: 1.1),
-        ),
-        const SizedBox(height: 16),
-        ecoScoreAsync.when(
-          loading: () => const SizedBox(height: 44),
-          error: (e, s) => const SizedBox.shrink(),
-          data: (score) => Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-            decoration: BoxDecoration(color: vibrantGreen.withOpacity(0.12), borderRadius: BorderRadius.circular(20)),
-            child: Row(
-              children: [
-                const Icon(Icons.eco_rounded, color: vibrantGreen, size: 24),
-                const SizedBox(width: 10),
-                Text(
-                  score != null ? 'Your Eco-Score: $score/100' : 'Eco-Score: not calculated yet',
-                  style: const TextStyle(color: vibrantGreen, fontWeight: FontWeight.w700, fontSize: 16),
+              const SizedBox(height: 24),
+              Text(
+                'Hello, ${displayName ?? 'there'}!',
+                style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold, height: 1.1),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Every choice adds up — let\'s keep it green.',
+                style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 13, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 20),
+              ecoScoreAsync.when(
+                loading: () => const SizedBox(height: 64),
+                error: (e, s) => const SizedBox.shrink(),
+                data: (score) => Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 16, offset: const Offset(0, 6)),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 52,
+                        height: 52,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            CircularProgressIndicator(
+                              value: score != null ? score / 100 : 0,
+                              strokeWidth: 5,
+                              backgroundColor: lightGreenBg,
+                              valueColor: const AlwaysStoppedAnimation(primaryGreen),
+                            ),
+                            Icon(Icons.eco_rounded, color: primaryGreen, size: 20),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              score != null ? 'Your Eco-Score' : 'Eco-Score',
+                              style: const TextStyle(color: textGray, fontSize: 12, fontWeight: FontWeight.w600),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              score != null ? '$score/100' : 'Not calculated yet',
+                              style: const TextStyle(color: textDark, fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 24),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(22, 24, 22, 28),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
         SizedBox(
           height: 42,
           child: ListView.separated(
@@ -166,8 +230,8 @@ class UserHomeScreen extends ConsumerWidget {
             itemCount: categories.length,
             separatorBuilder: (context, index) => const SizedBox(width: 10),
             itemBuilder: (context, index) => Chip(
-              label: Text(categories[index], style: const TextStyle(color: darkTeal, fontSize: 13, fontWeight: FontWeight.w600)),
-              backgroundColor: cardFill,
+              label: Text(categories[index], style: const TextStyle(color: textGray, fontSize: 13, fontWeight: FontWeight.w600)),
+              backgroundColor: sectionFill,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide.none),
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             ),
@@ -176,27 +240,27 @@ class UserHomeScreen extends ConsumerWidget {
         const SizedBox(height: 28),
         Row(
           children: const [
-            Icon(Icons.auto_awesome_rounded, color: vibrantGreen, size: 22),
+            Icon(Icons.auto_awesome_rounded, color: primaryGreen, size: 22),
             SizedBox(width: 8),
-            Text('Top Recommendations for You', style: TextStyle(color: darkText, fontWeight: FontWeight.bold, fontSize: 19)),
+            Text('Top Recommendations for You', style: TextStyle(color: textDark, fontWeight: FontWeight.bold, fontSize: 19)),
           ],
         ),
         const SizedBox(height: 16),
         productsAsync.when(
           loading: () => const Padding(
             padding: EdgeInsets.symmetric(vertical: 40),
-            child: Center(child: CircularProgressIndicator(color: vibrantGreen)),
+            child: Center(child: CircularProgressIndicator(color: primaryGreen)),
           ),
           error: (e, s) => const Padding(
             padding: EdgeInsets.all(16),
-            child: Text('Could not load recommendations.', style: TextStyle(color: darkText)),
+            child: Text('Could not load recommendations.', style: TextStyle(color: textDark)),
           ),
           data: (products) {
             if (products.isEmpty) {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 40),
                 child: Center(
-                  child: Text('No products yet.', style: TextStyle(color: darkTeal.withOpacity(0.7), fontSize: 15)),
+                  child: Text('No products yet.', style: TextStyle(color: textGray.withOpacity(0.7), fontSize: 15)),
                 ),
               );
             }
@@ -205,7 +269,11 @@ class UserHomeScreen extends ConsumerWidget {
                 return Container(
                   margin: const EdgeInsets.only(bottom: 14),
                   padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(color: cardFill, borderRadius: BorderRadius.circular(20)),
+                  decoration: BoxDecoration(
+                    color: pureWhite,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: borderGray),
+                  ),
                   child: Row(
                     children: [
                       ClipRRect(
@@ -218,8 +286,8 @@ class UserHomeScreen extends ConsumerWidget {
                           errorBuilder: (c, e, s) => Container(
                             width: 62,
                             height: 62,
-                            color: Colors.white,
-                            child: const Icon(Icons.inventory_2_outlined, color: darkTeal, size: 24),
+                            color: sectionFill,
+                            child: const Icon(Icons.inventory_2_outlined, color: textGray, size: 24),
                           ),
                         ),
                       ),
@@ -229,21 +297,21 @@ class UserHomeScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(p.name, maxLines: 1, overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(color: darkText, fontWeight: FontWeight.w700, fontSize: 15)),
+                                style: const TextStyle(color: textDark, fontWeight: FontWeight.w700, fontSize: 15)),
                             const SizedBox(height: 6),
                             Row(
                               children: [
                                 Text('\$${p.price.toStringAsFixed(2)}',
-                                    style: const TextStyle(color: darkTeal, fontWeight: FontWeight.w700, fontSize: 13)),
+                                    style: const TextStyle(color: textGray, fontWeight: FontWeight.w700, fontSize: 13)),
                                 const SizedBox(width: 8),
                                 Flexible(
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                    decoration: BoxDecoration(color: vibrantGreen.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+                                    decoration: BoxDecoration(color: lightGreenBg, borderRadius: BorderRadius.circular(10)),
                                     child: Text('${p.ecoScore}/100 Eco',
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(color: vibrantGreen, fontSize: 10, fontWeight: FontWeight.w700)),
+                                        style: const TextStyle(color: primaryGreen, fontSize: 10, fontWeight: FontWeight.w700)),
                                   ),
                                 ),
                               ],
@@ -257,7 +325,7 @@ class UserHomeScreen extends ConsumerWidget {
                           // TODO: navigate to product detail screen
                         },
                         style: TextButton.styleFrom(
-                          backgroundColor: vibrantGreen,
+                          backgroundColor: primaryGreen,
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                           minimumSize: Size.zero,
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -271,6 +339,9 @@ class UserHomeScreen extends ConsumerWidget {
               }).toList(),
             );
           },
+        ),
+            ],
+          ),
         ),
       ],
     );
