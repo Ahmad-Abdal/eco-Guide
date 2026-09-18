@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/search_results_providers.dart';
+import '../providers/scan_providers.dart';
+import '../providers/wishlist_providers.dart';
 import 'filters_screen.dart';
+import 'product_detail_screen.dart';
 
-class SearchResultsScreen extends StatefulWidget {
+class SearchResultsScreen extends ConsumerStatefulWidget {
   final String initialQuery;
   final String? category;
 
   const SearchResultsScreen({Key? key, required this.initialQuery, this.category}) : super(key: key);
 
   @override
-  State<SearchResultsScreen> createState() => SearchResultsScreenState();
+  ConsumerState<SearchResultsScreen> createState() => SearchResultsScreenState();
 }
 
-class SearchResultsScreenState extends State<SearchResultsScreen> {
+class SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
   static const Color pureWhite = Colors.white;
   static const Color textDark = Color(0xFF1A1A1A);
   static const Color textGray = Color(0xFF6B6B6B);
@@ -141,6 +145,15 @@ class SearchResultsScreenState extends State<SearchResultsScreen> {
     );
   }
 
+  Future<void> openProduct(SearchProduct product) async {
+    final detail = await fetchProductById(product.id);
+    if (!mounted || detail == null) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ProductDetailScreen(product: detail)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final cheapestPrice = results.isEmpty ? null : results.map((p) => p.price).reduce((a, b) => a < b ? a : b);
@@ -250,7 +263,9 @@ class SearchResultsScreenState extends State<SearchResultsScreen> {
                                 cheapestPrice != null &&
                                 product.price == cheapestPrice;
 
-                            return Container(
+                            return GestureDetector(
+                              onTap: () => openProduct(product),
+                              child: Container(
                               margin: const EdgeInsets.only(bottom: 14),
                               decoration: BoxDecoration(
                                 color: pureWhite,
@@ -313,11 +328,19 @@ class SearchResultsScreenState extends State<SearchResultsScreen> {
                                             ],
                                           ),
                                         ),
-                                        IconButton(
-                                          onPressed: () {
-                                            // TODO: wishlist toggle.
+                                        Consumer(
+                                          builder: (context, ref, child) {
+                                            final isWishlistedAsync = ref.watch(isWishlistedProvider(product.id));
+                                            final isWishlisted = isWishlistedAsync.asData?.value ?? false;
+                                            return IconButton(
+                                              onPressed: () => ref.read(wishlistNotifierProvider.notifier).toggle(product.id),
+                                              icon: Icon(
+                                                isWishlisted ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                                                color: isWishlisted ? Colors.redAccent : textGray,
+                                                size: 20,
+                                              ),
+                                            );
                                           },
-                                          icon: const Icon(Icons.favorite_border_rounded, color: textGray, size: 20),
                                         ),
                                       ],
                                     ),
@@ -342,6 +365,7 @@ class SearchResultsScreenState extends State<SearchResultsScreen> {
                                       ),
                                     ),
                                 ],
+                              ),
                               ),
                             );
                           },

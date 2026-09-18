@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class StoreSummary {
+  final String id;
   final String name;
   final String address;
   final String? phone;
@@ -10,6 +12,7 @@ class StoreSummary {
   final double longitude;
 
   const StoreSummary({
+    required this.id,
     required this.name,
     required this.address,
     this.phone,
@@ -20,6 +23,7 @@ class StoreSummary {
 
   factory StoreSummary.fromMap(Map<String, dynamic> map) {
     return StoreSummary(
+      id: map['id'] as String? ?? '',
       name: map['name'] as String? ?? 'Unknown store',
       address: map['address'] as String? ?? '',
       phone: map['phone'] as String?,
@@ -32,6 +36,7 @@ class StoreSummary {
 
 class ProductDetail {
   final String id;
+  final String storeId;
   final String name;
   final String imageUrl;
   final double price;
@@ -48,6 +53,7 @@ class ProductDetail {
 
   const ProductDetail({
     required this.id,
+    required this.storeId,
     required this.name,
     required this.imageUrl,
     required this.price,
@@ -66,6 +72,7 @@ class ProductDetail {
   factory ProductDetail.fromMap(Map<String, dynamic> map) {
     return ProductDetail(
       id: map['id'] as String,
+      storeId: map['store_id'] as String? ?? '',
       name: map['name'] as String? ?? 'Unnamed product',
       imageUrl: map['image_url'] as String? ?? '',
       price: (map['price'] as num?)?.toDouble() ?? 0,
@@ -82,6 +89,31 @@ class ProductDetail {
         map['stores'] as Map<String, dynamic>? ?? {},
       ),
     );
+  }
+}
+
+SupabaseClient get _supabase => Supabase.instance.client;
+
+const _productWithStoreSelect =
+    '*, stores(id, name, address, phone, website, latitude, longitude)';
+
+// Shared by the Scan screen, Search results (tapping a product card),
+// and the Wishlist screen — one place that knows how to turn a
+// product id into a full ProductDetail.
+Future<ProductDetail?> fetchProductById(String productId) async {
+  final id = productId.trim();
+  if (id.isEmpty) return null;
+  try {
+    final response = await _supabase
+        .from('products')
+        .select(_productWithStoreSelect)
+        .eq('id', id)
+        .maybeSingle();
+    if (response == null) return null;
+    return ProductDetail.fromMap(response);
+  } catch (error) {
+    debugPrint('fetchProductById failed: $error');
+    return null;
   }
 }
 
@@ -113,47 +145,34 @@ class ProductLookupNotifier extends Notifier<ProductLookupState> {
   @override
   ProductLookupState build() => const ProductLookupState();
 
-  SupabaseClient get supabase => Supabase.instance.client;
+  SupabaseClient get supabase => _supabase;
 
   Future<void> lookupProduct(String rawCode) async {
     final productId = rawCode.trim();
     if (productId.isEmpty) return;
 
     state = state.copyWith(isLoading: true, errorMessage: null, product: null);
-    try {
-      final response = await supabase
-          .from('products')
-          .select('*, stores(name, address, phone, website, latitude, longitude)')
-          .eq('id', productId)
-          .maybeSingle();
 
-      if (response == null) {
-        state = state.copyWith(
-          isLoading: false,
-          errorMessage: 'No product found for this code.',
-        );
-        return;
-      }
+    final product = await fetchProductById(productId);
 
-      // Log the scan so it counts toward the admin dashboard's Scans
-      // stat. Best-effort: a logging failure shouldn't block showing
-      // the product the user actually scanned.
-      try {
-        await supabase.from('scans').insert({'product_id': productId});
-      } catch (_) {
-        // Ignored — the scan itself still succeeds for the user.
-      }
-
+    if (product == null) {
       state = state.copyWith(
         isLoading: false,
-        product: ProductDetail.fromMap(response),
+        errorMessage: 'No product found for this code.',
       );
-    } catch (error) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'Invalid code or product not found.',
-      );
+      return;
     }
+
+    // Log the scan so it counts toward the admin dashboard's Scans
+    // stat. Best-effort: a logging failure shouldn't block showing
+    // the product the user actually scanned.
+    try {
+      await supabase.from('scans').insert({'product_id': productId});
+    } catch (error) {
+      debugPrint('Scan logging failed: $error');
+    }
+
+    state = state.copyWith(isLoading: false, product: product);
   }
 
   void reset() {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/browse_providers.dart';
 import 'search_results_screen.dart';
+import 'all_categories_screen.dart';
 
 class BrowseScreen extends ConsumerStatefulWidget {
   const BrowseScreen({Key? key}) : super(key: key);
@@ -9,6 +10,18 @@ class BrowseScreen extends ConsumerStatefulWidget {
   @override
   ConsumerState<BrowseScreen> createState() => BrowseScreenState();
 }
+
+// Display order for the home grid only — Fashion first (short, single
+// line) so Kitchen Accessories (two lines) lands in the second row
+// instead of visually competing for space in the top row.
+const _homeGridOrder = [
+  'Fashion',
+  'Cleaning',
+  'Home & Living',
+  'Storage',
+  'Personal Care',
+  'Dining',
+];
 
 class BrowseScreenState extends ConsumerState<BrowseScreen> {
   static const Color pureWhite = Colors.white;
@@ -40,54 +53,16 @@ class BrowseScreenState extends ConsumerState<BrowseScreen> {
   @override
   Widget build(BuildContext context) {
     final popularSearchesAsync = ref.watch(popularSearchesProvider);
-    final gridCategories = browseCategories.take(6).toList();
+    final gridCategories = _homeGridOrder
+        .map((name) => browseCategories.firstWhere((c) => c.name == name))
+        .toList();
 
     return Scaffold(
       backgroundColor: pureWhite,
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: searchController,
-                    onSubmitted: submitSearch,
-                    style: const TextStyle(color: textDark),
-                    decoration: InputDecoration(
-                      hintText: 'Search products, brands, or categories...',
-                      hintStyle: TextStyle(color: textGray, fontSize: 13),
-                      prefixIcon: const Icon(Icons.search, color: textGray),
-                      // suffixIcon: const Icon(Icons.camera_alt_outlined, color: textGray),
-                      filled: true,
-                      fillColor: sectionFill,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () {
-                    // TODO: open filters
-                  },
-                  child: Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: sectionFill,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    // child: const Icon(Icons.tune_rounded, color: primaryGreen),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -97,7 +72,10 @@ class BrowseScreenState extends ConsumerState<BrowseScreen> {
                 ),
                 TextButton(
                   onPressed: () {
-                    // TODO: navigate to a full categories screen.
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AllCategoriesScreen()),
+                    );
                   },
                   child: const Text(
                     'See All',
